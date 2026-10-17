@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Glücksrad – Individuell & mit eigener Musik</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <!-- Konfetti-Canvas für Gewinner-Animation -->
+  <canvas id="confettiCanvas" class="confetti-canvas"></canvas>
+
+  <!-- Obere Kopfleiste -->
+  <header class="topbar">
+    <div class="brand">
+      <div class="brand-wheel-icon"></div>
+      <h1>Glücksrad</h1>
+    </div>
+    <div class="topbar-actions">
+      <button id="openSettingsBtn" class="topbar-btn" title="Drehzeit, Musik & Design anpassen">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="3"></circle>
+          <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+        </svg>
+        <span>Einstellungen &amp; Musik</span>
+      </button>
+      <button id="themeToggleBtn" class="topbar-btn icon-only" title="Hell-/Dunkelmodus wechseln">
+        <svg id="themeIconSun" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" class="hidden">
+          <circle cx="12" cy="12" r="5"></circle>
+          <line x1="12" y1="1" x2="12" y2="3"></line>
+          <line x1="12" y1="21" x2="12" y2="23"></line>
+          <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+          <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+          <line x1="1" y1="12" x2="3" y2="12"></line>
+          <line x1="21" y1="12" x2="23" y2="12"></line>
+          <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+          <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+        </svg>
+        <svg id="themeIconMoon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+        </svg>
+      </button>
+      <button id="showSidebarFloatingBtn" class="topbar-btn hidden" title="Seitenleiste einblenden">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+          <circle cx="12" cy="12" r="3"></circle>
+        </svg>
+        <span>Panel zeigen</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- Hauptbereich -->
+  <main class="main-layout" id="mainLayout">
+    <!-- Linker/Zentraler Bereich: Das Glücksrad -->
+    <section class="wheel-section">
+      <div class="wheel-stage">
+        <div class="wheel-wrapper" id="wheelWrapper" title="Klicken oder Leertaste drücken zum Drehen">
+          <canvas id="wheelCanvas" width="700" height="700"></canvas>
+          <!-- Zeiger rechts (wie im Screenshot) -->
+          <div class="wheel-pointer" id="wheelPointer">
+            <svg viewBox="0 0 50 44" width="46" height="40">
+              <polygon points="4,22 46,4 46,40" fill="#e67e22" stroke="#ffffff" stroke-width="3" stroke-linejoin="round" id="pointerPolygon" />
+            </svg>
+          </div>
+          <!-- Klick-Hinweis in der Mitte oder darunter -->
+        </div>
+
+        <!-- Statusleiste unter dem Rad -->
+        <div class="wheel-controls-bar">
+          <button id="spinBtn" class="spin-btn">
+            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5">
+              <polygon points="5 3 19 12 5 21 5 3" fill="currentColor"></polygon>
+            </svg>
+            <span>Rad drehen!</span>
+          </button>
+
+          <div class="quick-status-pills">
+            <button class="status-pill" id="quickDurationPill" title="Klicken zum Ändern der Drehzeit">
+              ⏱️ <span id="quickDurationText">8 Sek.</span>
+            </button>
+            <button class="status-pill" id="quickSongPill" title="Musik während der Drehung an-/ausschalten">
+              🎵 <span id="quickSongText">Song: An</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Rechte Seitenleiste (angelehnt an Screenshot 2) -->
+    <aside class="sidebar-panel" id="sidebarPanel">
+      <!-- Tabs oben wie im Screenshot -->
+      <div class="sidebar-tabs">
+        <button class="tab-btn active" data-tab="entriesTab" title="Auswahl-Optionen bearbeiten">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"></path>
+          </svg>
+        </button>
+
+        <button class="tab-btn" data-tab="resultsTab" title="Historie aller Gewinner-Optionen">
+          <div class="tab-icon-badge-wrap">
+            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path>
+              <rect x="8" y="2" width="8" height="4" rx="1" ry="1"></rect>
+              <path d="M9 12l2 2 4-4"></path>
+              <line x1="9" y1="17" x2="15" y2="17"></line>
+            </svg>
+            <span class="tab-badge" id="historyCountBadge">0</span>
+          </div>
+        </button>
+
+        <button class="tab-btn" id="hideSidebarBtn" title="Seitenleiste ausblenden">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path>
+            <line x1="1" y1="1" x2="23" y2="23"></line>
+          </svg>
+        </button>
+
+        <button class="tab-btn tab-btn-wheel-settings" data-tab="settingsTab" title="Musik, Zeit & Farben einstellen">
+          <span class="plus-sign">+</span>
+          <span class="mini-color-wheel"></span>
+        </button>
+      </div>
+
+      <!-- TAB 1: Einträge bearbeiten -->
+      <div class="tab-content active" id="entriesTab">
+        <!-- Werkzeugleiste über dem Textfeld (wie im Screenshot) -->
+        <div class="entries-toolbar">
+          <button id="shuffleBtn" class="tool-btn" title="Einträge zufällig mischen">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="16 3 21 3 21 8"></polyline>
+              <line x1="4" y1="20" x2="21" y2="3"></line>
+              <polyline points="21 16 21 21 16 21"></polyline>
+              <line x1="15" y1="15" x2="21" y2="21"></line>
+              <line x1="4" y1="4" x2="9" y2="9"></line>
+            </svg>
+          </button>
+
+          <button id="sortBtn" class="tool-btn" title="Alphabetisch sortieren (A–Z / Z–A)">
+            <span class="sort-icon-text">↑<small>A<br>Z</small></span>
+          </button>
+
+          <button id="advancedModeBtn" class="tool-btn" title="Erweiterter Modus (Einzelne Farben, Bilder & Gewichtung pro Auswahl)">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="3"></circle>
+              <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+            </svg>
+          </button>
+
+          <button id="addImageEntryBtn" class="tool-btn tool-btn-wide" title="Bild als Auswahl-Option oder Rad-Mitte hinzufügen">
+            <span>Bild hinzufügen</span>
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+              <circle cx="8.5" cy="8.5" r="1.5"></circle>
+              <polyline points="21 15 16 10 5 21"></polyline>
+            </svg>
+          </button>
+          <input type="file" id="segmentImageInput" accept="image/*" class="hidden" />
+        </div>
+
+        <!-- Einfacher Textmodus (Standard wie in Screenshot 2) -->
+        <div id="simpleEditorContainer" class="editor-box-wrap">
+          <textarea
+            id="entriesTextarea"
+            class="entries-textarea"
+            placeholder="Eine Option pro Zeile eingeben..."
+            spellcheck="false"
+          ></textarea>
+
+          <!-- Emoji-Button unten rechts im Textfeld -->
+          <div class="emoji-picker-wrap">
+            <button id="emojiToggleBtn" class="emoji-trigger-btn" title="Emoji einfügen" type="button">
+              😊
+            </button>
+            <div id="emojiPopover" class="emoji-popover hidden">
+              <div class="emoji-grid" id="emojiGrid"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Erweiterter Modus (Farbe, Bild, Gewichtung, Ein/Aus pro Zeile) -->
+        <div id="advancedEditorContainer" class="advanced-editor-wrap hidden">
+          <div class="advanced-header-row">
+            <span>Farbe / Text / Bild</span>
+            <span>Gewicht</span>
+          </div>
+          <div id="advancedEntriesList" class="advanced-entries-list"></div>
+          <button id="addAdvancedRowBtn" class="add-row-btn" type="button">+ Neue Option hinzufügen</button>
+        </div>
+
+        <!-- Fußzeile mit "Einträge: X" Badge -->
+        <div class="entries-footer">
+          <button id="resetDefaultEntriesBtn" class="text-link-btn" title="Auf Standard zurücksetzen">Zurücksetzen</button>
+          <span class="entries-count-pill" id="entriesCountPill">Einträge: 3</span>
+        </div>
+      </div>
+
+      <!-- TAB 2: Historie aller Gewinner-Optionen -->
+      <div class="tab-content" id="resultsTab">
+        <div class="results-header">
+          <h3>Gewinner-Historie</h3>
+          <div class="results-actions">
+            <button id="restoreRemovedBtn" class="small-action-btn hidden" title="Entfernte Optionen wieder ins Rad einfügen">
+              🔄 Entfernte wiederherstellen
+            </button>
+            <button id="clearHistoryBtn" class="small-action-btn danger" title="Historie leeren">
+              🗑️ Leeren
+            </button>
+          </div>
+        </div>
+        <p class="results-subtitle">Alle bisherigen gezogenen Gewinner-Optionen in chronologischer Reihenfolge:</p>
+        <div id="historyList" class="history-list">
+          <div class="empty-history">Noch keine Drehung durchgeführt.</div>
+        </div>
+      </div>
+
+      <!-- TAB 3: Musik, Drehzeit & Rad-Einstellungen (Direkt in der Seitenleiste erreichbar) -->
+      <div class="tab-content" id="settingsTab">
+        <div class="settings-scroll">
+          <!-- 1. Zeit & Drehung -->
+          <div class="settings-card">
+            <h4>⏱️ Drehzeit &amp; Dynamik</h4>
+            <div class="control-group">
+              <div class="control-label-row">
+                <label for="spinDurationRange">Drehdauer (Sekunden)</label>
+                <div class="number-with-unit">
+                  <input type="number" id="spinDurationNumber" min="1" max="120" step="1" value="8" />
+                  <span>Sek.</span>
+                </div>
+              </div>
+              <input type="range" id="spinDurationRange" min="1" max="60" step="1" value="8" />
+            </div>
+
+            <div class="control-group">
+              <div class="control-label-row">
+                <label for="spinPowerRange">Dreh-Geschwindigkeit (Umdrehungen)</label>
+                <span id="spinPowerLabel">Mittel (8x)</span>
+              </div>
+              <input type="range" id="spinPowerRange" min="3" max="25" step="1" value="8" />
+            </div>
+          </div>
+
+          <!-- 2. Eigener Song während der Drehung -->
+          <div class="settings-card">
+            <div class="card-header-toggle">
+              <h4>🎵 Musik während der Drehung</h4>
+              <label class="switch">
+                <input type="checkbox" id="enableSpinMusicToggle" checked />
+                <span class="slider"></span>
+              </label>
+            </div>
+
+            <div id="spinMusicControlsGroup">
+              <div class="control-group">
+                <label>Musik-Quelle auswählen</label>
+                <div class="radio-pills">
+                  <label class="radio-pill">
+                    <input type="radio" name="musicSourceType" value="custom" id="musicSourceCustom" checked />
+                    <span>Eigener Song (Datei)</span>
+                  </label>
+                  <label class="radio-pill">
+                    <input type="radio" name="musicSourceType" value="synth" id="musicSourceSynth" />
+                    <span>Integrierte Melodie</span>
+                  </label>
+                </div>
+              </div>
+
+              <!-- Upload-Bereich für eigenen Song -->
+              <div id="customSongUploadSection" class="custom-song-box">
+                <div class="song-file-row">
+                  <label for="songFileInput" class="upload-song-btn">
+                    📂 Eigene Audiodatei wählen (MP3/WAV/OGG)
+                  </label>
+                  <input type="file" id="songFileInput" accept="audio/*" class="hidden" />
+                </div>
+                <div class="current-song-info" id="currentSongInfo">
+                  <span id="songFileName" class="song-filename">Noch kein eigener Song gewählt (nutzt Melodie bis zum Upload)</span>
+                  <button type="button" id="removeSongBtn" class="icon-btn-small hidden" title="Eigenen Song entfernen">✕</button>
+                </div>
+
+                <!-- Startpunkt & Vorschau für eigenen Song -->
+                <div class="control-group" id="songOffsetGroup">
+                  <div class="control-label-row">
+                    <label for="songStartOffsetRange">Startpunkt im Song</label>
+                    <div class="number-with-unit">
+                      <input type="number" id="songStartOffsetNumber" min="0" max="600" step="0.5" value="0" />
+                      <span>Sek.</span>
+                    </div>
+                  </div>
+                  <input type="range" id="songStartOffsetRange" min="0" max="180" step="0.5" value="0" />
+                  <div class="song-preview-row">
+                    <button type="button" id="previewSongBtn" class="small-action-btn">▶️ Ab Startpunkt vorhören</button>
+                    <span id="songDurationHint" class="muted-hint"></span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Lautstärke & Ausblenden -->
+              <div class="control-group">
+                <div class="control-label-row">
+                  <label for="musicVolumeRange">Musik-Lautstärke</label>
+                  <span id="musicVolumeLabel">80%</span>
+                </div>
+                <input type="range" id="musicVolumeRange" min="0" max="100" step="1" value="80" />
+              </div>
+
+              <label class="checkbox-row">
+                <input type="checkbox" id="musicFadeOutToggle" checked />
+                <span>Song am Ende der Drehung sanft ausblenden (Fade-Out)</span>
+              </label>
+
+              <label class="checkbox-row">
+                <input type="checkbox" id="enableTickSoundToggle" />
+                <span>Zusätzliches Zeiger-Klackern beim Drehen abspielen</span>
+              </label>
+            </div>
+          </div>
+
+          <!-- 3. Gewinner-Sound am Ende -->
+          <div class="settings-card">
+            <div class="card-header-toggle">
+              <h4>🎉 Gewinner-Sound / Applaus</h4>
+              <label class="switch">
+                <input type="checkbox" id="enableWinnerSoundToggle" checked />
+                <span class="slider"></span>
+              </label>
+            </div>
+
+            <div id="winnerSoundControlsGroup">
+              <div class="control-group">
+                <div class="control-label-row">
+                  <label for="winnerVolumeRange">Gewinner-Sound Lautstärke</label>
+                  <span id="winnerVolumeLabel">85%</span>
+                </div>
+                <input type="range" id="winnerVolumeRange" min="0" max="100" step="1" value="85" />
+              </div>
+
+              <div class="song-file-row">
+                <label for="winnerSoundFileInput" class="upload-song-btn secondary">
+                  🎵 Optional: Eigenen Gewinner-Sound wählen
+                </label>
+                <input type="file" id="winnerSoundFileInput" accept="audio/*" class="hidden" />
+              </div>
+              <div class="current-song-info">
+                <span id="winnerSoundFileName" class="song-filename">Standard: Feier-Fanfare &amp; Jubel</span>
+                <button type="button" id="removeWinnerSoundBtn" class="icon-btn-small hidden" title="Auf Standard zurücksetzen">✕</button>
+                <button type="button" id="testWinnerSoundBtn" class="small-action-btn">🔊 Testen</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- 4. Optik & Rad-Design -->
+          <div class="settings-card">
+            <h4>🎨 Rad-Design &amp; Farben</h4>
+            <div class="control-group">
+              <label for="colorPaletteSelect">Farbschema</label>
+              <select id="colorPaletteSelect" class="select-input">
+                <option value="classic">Klassisch (Rot, Grün, Orange, Blau – wie Vorlage)</option>
+                <option value="vibrant">Lebendig &amp; Bunt (Regenbogen)</option>
+                <option value="pastel">Pastell-Töne</option>
+                <option value="neon">Neon / Cyberpunk</option>
+                <option value="ocean">Ozean &amp; Türkis</option>
+              </select>
+            </div>
+
+            <div class="control-group">
+              <div class="control-label-row">
+                <label for="centerRadiusRange">Größe des Mittelkreises</label>
+                <span id="centerRadiusLabel">18%</span>
+              </div>
+              <input type="range" id="centerRadiusRange" min="0" max="35" step="1" value="18" />
+            </div>
+
+            <label class="checkbox-row">
+              <input type="checkbox" id="enableConfettiToggle" checked />
+              <span>Konfetti-Regen bei Gewinner anzeigen</span>
+            </label>
+          </div>
+        </div>
+      </div>
+    </aside>
+  </main>
+
+  <!-- Gewinner-Modal (Popup nach Ende der Drehung) -->
+  <div id="winnerModal" class="modal-backdrop hidden" role="dialog" aria-modal="true">
+    <div class="winner-modal-card">
+      <div class="winner-modal-header" id="winnerModalHeader">
+        <span>🎉 Wir haben einen Gewinner!</span>
+        <button id="closeWinnerModalX" class="modal-close-x" title="Schließen">✕</button>
+      </div>
+      <div class="winner-modal-body">
+        <div id="winnerImagePreviewWrap" class="winner-image-wrap hidden">
+          <img id="winnerImagePreview" src="" alt="Gewinner Bild" />
+        </div>
+        <div class="winner-text-display" id="winnerTextDisplay">Auswahl 1</div>
+      </div>
+      <div class="winner-modal-footer">
+        <button id="closeWinnerBtn" class="modal-btn secondary">Schließen</button>
+        <button id="removeWinnerBtn" class="modal-btn primary-danger">Auswahl entfernen</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
